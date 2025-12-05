@@ -18,22 +18,22 @@ class DispatcherAddonsController extends Controller
     public function index() {
         return Inertia::render('pages/dispatcher_addons/index');
     }
-     public function verification_submit(Request $request)
-    {    
-            $format = check_code_format($request->purchase_code);
+    //  public function verification_submit(Request $request)
+    // {    
+    //         $format = check_code_format($request->purchase_code);
 
-            if($format['success'])
-            {
-                $UpdateSettingcontract = app("update-service");
-                $softwarecheck = $UpdateSettingcontract->codeVerify(); 
-               return json_encode($softwarecheck);
-            }
-            else{
-                return json_encode($format);
-            } 
+    //         if($format['success'])
+    //         {
+    //             $UpdateSettingcontract = app("update-service");
+    //             $softwarecheck = $UpdateSettingcontract->codeVerify(); 
+    //            return json_encode($softwarecheck);
+    //         }
+    //         else{
+    //             return json_encode($format);
+    //         } 
        
 
-    }
+    // }
     public function dispatcher_files_uploads(Request $request){
 
         try {
