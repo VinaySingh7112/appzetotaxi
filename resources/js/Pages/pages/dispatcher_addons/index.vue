@@ -65,14 +65,10 @@ export default {
         };
 
         const form = useForm({
-            purchase_code: null,
             dispatcher_zip_file: null,
-            key:null,
         });
 
-        const validationRules = {
-            purchase_code: { required: true },
-        }
+        const validationRules = {}
         const zipFileError = ref(false);
 
         const handleFileUpload = (e) => {
@@ -139,61 +135,11 @@ export default {
         const validateJsonFile = (file) => {
             return file && file.type === 'application/zip' || file.type === 'application/x-zip-compressed' || file.name.endsWith('.zip');
         };
-        const showUploadOption =  ref(false);
-        const codeSuccesss = ref(false);
-        const showHideForm =  ref(true);
+        const showUploadOption =  ref(true);
+        const codeSuccesss = ref(true);
+        const showHideForm =  ref(false);
         const codeError = ref(false);
         const isButtonDisabled = ref(false);
-
-        const verifyPurchaseCode = async() =>{
-            errors.value = validationRef.value.validate();
-            if (Object.keys(errors.value).length > 0) {
-                return;
-            }
-            try {
-
-                const formData = new FormData();
-                 if (form.purchase_code) {
-                   formData.append('purchase_code', form.purchase_code);
-                    formData.append('key', 'Restart');
-                }
-                isButtonDisabled.value = true;
-                 
-                let response;
-                response = await axios.post('dispatcher-addons/verfication-submit', formData);
-                console.log("response",response.data.success);
-                if (response.data.success == true) {
-                successMessage.value = t('purchase_code_verified_successfully');
-                setTimeout(()=>{
-                    successMessage.value = "";
-                },5000)
-                form.reset();
-                showUploadOption.value = true;
-                codeSuccesss.value = true;
-                showHideForm.value = false;
-                codeError.value = false;
-                } else {
-                alertMessage.value = t('failed_to_verify_the_purchase_code');
-                codeError.value = true;
-                 isButtonDisabled.value = false;
-                setTimeout(()=>{
-                    alertMessage.value = "";
-                },5000)
-                }
-            } catch (error) {
-                if (error.response && error.response.status === 422) {
-                errors.value = error.response.data.errors;
-                isButtonDisabled.value = false;
-                } else if (error.response && error.response.status === 403) {
-                alertMessage.value = error.response.data.alertMessage;
-                isButtonDisabled.value = false;
-                } else {
-                isButtonDisabled.value = false;
-                console.error(t('error_verify_the_purchase_code'), error);
-                alertMessage.value = t('failed_to_verify_the_purchase_code_catch');
-                }
-            }
-        };
 
         return {
             successMessage,
@@ -205,7 +151,6 @@ export default {
             zipFileError,
             handleFileUpload,
             handleSubmit,
-            verifyPurchaseCode,
             showUploadOption,
             codeSuccesss,
             showHideForm,
@@ -243,30 +188,7 @@ export default {
                     <BCardBody class="border border-dashed border-end-0 border-start-0">
                         <form @submit.prevent>
                             <FormValidation ref="validationRef" :form="form" :rules="validationRules">
-                                <div class="row mb-3">
-                                    <div class="col-sm-6" v-if="showHideForm">
-                                        <div class="mb-3">
-                                            <label for="purchase_code" class="form-label">{{$t("purchase_code")}}<span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" :placeholder="$t('enter_purchase_code')" id="purchase_code" v-model="form.purchase_code" />
-                                            <span v-for="(error, index) in errors.purchase_code" :key="index" class="text-danger">{{ error }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-1 mt-4" v-if="showHideForm">
-                                        <div class="text-end">
-                                            <button type="button" class="btn btn-primary" @click.prevent="verifyPurchaseCode" :disabled="isButtonDisabled || app_for === 'demo'">{{ $t('verify') }}</button>
-                                        </div>
-                                    </div>
-                                     <div v-if="codeSuccesss" class="text-success fs-16">
-                                        <i class="ri-checkbox-circle-fill fs-14 align-middle"></i>
-                                        {{$t("purchase_code_has_been_verified")}}
-                                    </div>
-                                    <div v-if="codeError" class="text-danger fs-14">
-                                        <i class="ri-close-circle-fill fs-15 align-middle"></i>
-                                        {{$t("code_has_invalid")}}
-                                    </div>
-                                </div>
-
-                                <div class="row" v-if="showUploadOption">
+                                <div class="row">
                                     <div class="col-sm-6">
                                         <div class="mb-3">
                                             <label for="dispatcher_zip_file" class="form-label">{{$t("dispatcher_zip_file")}}
@@ -315,22 +237,6 @@ export default {
         <BModal v-model="dispatcher_addons" hide-footer :title="$t('dispatcher_addons')" class="v-modal-custom" size="md">
             <div class="container"> 
                 <ul class="list-unstyled vstack gap-3">
-                    <li>
-                        <div class="d-flex">
-                        <div class="flex-shrink-0 text-success me-1">
-                            <i class="ri-checkbox-circle-fill fs-15 align-middle"></i>
-                        </div>
-                        <div class="flex-grow-1">Enter the Purchase Code and Verify it</div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="d-flex">
-                        <div class="flex-shrink-0 text-success me-1">
-                            <i class="ri-checkbox-circle-fill fs-15 align-middle"></i>
-                        </div>
-                        <div class="flex-grow-1">After, verify the Purchase Code it show the Zip file Uplaod Section.</div>
-                        </div>
-                    </li>
                     <li>
                         <div class="d-flex">
                         <div class="flex-shrink-0 text-success me-1">
